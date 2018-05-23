@@ -1,1 +1,2 @@
 battery_voltage bcc.mem lda.reg.mem cmp.reg.num
+vehicle_speed bcc.mem lda.reg.mem

@@ -8,7 +8,7 @@
 using namespace std;
 
 // Features loaded in from config
-map<string, vector<string>> features;
+map<string, vector<string>> grams;
 
 /**
  * Trim whitespace on string
@@ -29,6 +29,11 @@ string createGram(string& instruction)
 	string opcode = instruction.substr(0, instruction.find(" "));
 	string opperands = instruction.substr(opcode.size(), instruction.size());
 
+	// Check instructions with no opperands
+	if (opperands == "") {
+		return opcode;
+	}
+	
 	stringstream stream(opperands);
 	string opperand;
 
@@ -52,11 +57,11 @@ string createGram(string& instruction)
 }
 
 /**
- * Loads all the features we want to find
+ * Loads all the grams we want to find
  */
-void loadFeatures()
+void loadGrams()
 {
-	ifstream file("features.txt");
+	ifstream file("grams.txt");
 	string fileLine, sensor, gram;
 
 	// Loop though file
@@ -69,13 +74,14 @@ void loadFeatures()
 		while (!stream.eof()) {
 			getline(stream, gram, ' ');
 			
-			features[sensor].push_back(gram);
+			grams[sensor].push_back(gram);
 		}
 	}
 
-	// Output features
-	cout << "===== LOADED FEATURES =====" << endl;
-	for (auto i = features.begin(); i != features.end(); i++) {
+	// Output grams
+	cout << "===== LOADED GRAMS =====" << endl;
+	
+	for (auto i = grams.begin(); i != grams.end(); i++) {
 		cout << i->first << endl;
 		
 		for (auto j = i->second.begin(); j != i->second.end(); j++) {
@@ -89,14 +95,15 @@ void loadFeatures()
  */
 int main()
 {
-	loadFeatures();
+	loadGrams();
 	
 	ifstream sample("sample.txt");
-
-	string fileLine;
+	string fileLine, instructionGram;
 
 	while (getline(sample, fileLine)) {
-		fileLine = createGram(fileLine);
+		instructionGram = createGram(fileLine);
+		
+		//todo: check grams
 	}
 
 	// Cleanup
