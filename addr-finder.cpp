@@ -57,11 +57,11 @@ string createGram(string& instruction)
 void loadFeatures()
 {
 	ifstream file("features.txt");
-	string file_line, sensor, gram;
+	string fileLine, sensor, gram;
 
 	// Loop though file
-	while (getline(file, file_line)) {
-		istringstream stream(file_line);
+	while (getline(file, fileLine)) {
+		istringstream stream(fileLine);
 		
 		getline(stream, sensor, ' ');
 		
@@ -93,10 +93,10 @@ int main()
 	
 	ifstream sample("sample.txt");
 
-	string file_line;
+	string fileLine;
 
-	while (getline(sample, file_line)) {
-		file_line = createGram(file_line);
+	while (getline(sample, fileLine)) {
+		fileLine = createGram(fileLine);
 	}
 
 	// Cleanup
