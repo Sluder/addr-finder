@@ -35,6 +35,7 @@ class instructionObj{
   string objGram;  //this has variables in it (ex: bcc.Var1.Var27)
   int objNumber; //distinguishes each object from one another
   bool noOpperands; //distinuguishes if a instruction line has opperands or not (ex: bcc[true] or lda al, 0x102f[false])
+  string expression;
 
  //turn this into the object's constructor potentially
   instructionObj(string& instruction, int& object_number,vector<string>& usedValues){
@@ -58,42 +59,83 @@ class instructionObj{
       while (stream.good()) {
         getline(stream, opperand, ',');
         opperand = trim(opperand);
+        int counter; //used for determining the position of the '+' sign
+        //check to see if opperand contains arithmetic or not (ex: dp + 0x03 + ix)
+        if (opperand.find('+') != std::string::npos){ //check for all types of arithmetic (UPDATE AT SOME POINT)
+          expression = opperand; //opperand contains arithemic
+          string expression_value;
+          string expression_variable;
+          counter = 0; //reset for each new arithmetic opperand
+          //std::cout << expression<< '\n'; //test
 
-        string variable; //instantiate variable
-        //add operand to values array for current object (Needs updating)
-        values.push_back(opperand);
+          stringstream stream2(opperand);
+          while (stream2.good()){
+            getline(stream2, expression_value, '+');
+            expression_value = trim(expression_value);
+            //add operand to values array for current object (Needs updating)
+            values.push_back(expression_value);
 
-        //USED FOR CREATING objGram
-        //loop through usedValues vector to see if the opperand has been used
-        int position = find(usedValues.begin(), usedValues.end(), opperand) - usedValues.begin();
-        if (position < usedValues.size()){
-          //variable has already been used
-          //create a variable based on that index and add to current object's variables array
-          variable = "Var" + to_string(position);
-          variables.push_back(variable);
+            //USED FOR CREATING objGram
+            //loop through usedValues vector to see if the opperand has been used
+            int position = find(usedValues.begin(), usedValues.end(), expression_value) - usedValues.begin();
+            if (position < usedValues.size()){
+              //variable has already been used
+              //create a variable based on that index and add to current object's variables array
+              expression_variable = "Var" + to_string(position);
+              variables.push_back(expression_variable);
+            }else{
+              //add opperand to end of the usedValues vector
+              usedValues.push_back(expression_value);
+              //get index where operand was just placed in array and create variable based on it
+              expression_variable = "Var" + to_string(usedValues.size() - 1);
+              //add new variable to instruction object's variable vector (needs updating)
+              variables.push_back(expression_variable);
+            }
+            if (counter <= 0){
+              objGram += "." + expression_variable;
+            }else{
+              objGram += " + " + expression_variable;
+            }
+            counter++; //increment fo proper arithmetic symbol position
+          }
         }else{
-          //add opperand to end of the usedValues vector
-          usedValues.push_back(opperand);
-          //get index where operand was just placed in array and create variable based on it
-          variable = "Var" + to_string(usedValues.size() - 1);
-          //add new variable to instruction object's variable vector (needs updating)
-          variables.push_back(variable);
-        }
 
-        //USED FOR CONSTRUCTING objOpCode
-        if (opperand.substr(0, 2) == "#0") {
-          opperand = "num";
-        } else if (opperand.substr(0, 2) == "0x") {
-          opperand = "mem";
-        } else {
-          opperand = "reg";
-        }
-        //start concatenating to create objGram
-        objGram += "." + variable;
-        //start concatenating to create opcode
-        opcode += "." + opperand;
+          string variable; //instantiate variable
+          //add operand to values array for current object (Needs updating)
+          values.push_back(opperand);
 
-        //assign opcode to specific object's objGram
+          //USED FOR CREATING objGram
+          //loop through usedValues vector to see if the opperand has been used
+          int position = find(usedValues.begin(), usedValues.end(), opperand) - usedValues.begin();
+          if (position < usedValues.size()){
+            //variable has already been used
+            //create a variable based on that index and add to current object's variables array
+            variable = "Var" + to_string(position);
+            variables.push_back(variable);
+          }else{
+            //add opperand to end of the usedValues vector
+            usedValues.push_back(opperand);
+            //get index where operand was just placed in array and create variable based on it
+            variable = "Var" + to_string(usedValues.size() - 1);
+            //add new variable to instruction object's variable vector (needs updating)
+            variables.push_back(variable);
+          }
+
+          //USED FOR CONSTRUCTING objOpCode
+          if (opperand.substr(0, 2) == "#0") {
+            opperand = "num";
+          } else if (opperand.substr(0, 2) == "0x") {
+            opperand = "mem";
+          } else {
+            opperand = "reg";
+          }
+          //start concatenating to create objGram
+          objGram += "." + variable;
+          //start concatenating to create opcode
+          opcode += "." + opperand;
+
+          //assign opcode to specific object's objGram
+        }
       }
       objOpCode = opcode;
       noOpperands = false; //this instruction has opperands
@@ -155,8 +197,8 @@ int main()
     //std::cout << object_number << '\n';
 	  //std::cout << usedValues.front() << '\n';
     std::cout << foo.objGram<< '\n';
-    std::cout << foo.objOpCode<< '\n';
-    std::cout << objects.size()<< '\n';
+    //std::cout << foo.objOpCode<< '\n';
+    //std::cout << objects.size()<< '\n';
     object_number++;
 	}
 
