@@ -5,61 +5,16 @@
 #include <utility>
 #include <regex>
 
+//instruction object header file
+#include "instruction-object.h"
 using namespace std;
 
 // Features loaded in from config
-map<string, vector<string>> grams;
+//map<string, vector<string>> grams;
 
-/**
- * Trim whitespace on string
- */
-string trim(string& str)
-{
-    size_t start = str.find_first_not_of(" ");
-    size_t end = str.find_last_not_of(" ");
 
-	return str.substr(start, end - start + 1);
-}
-
-/**
- * Replaces opperands with normalized code
- */
-string createGram(string& instruction)
-{
-	string opcode = instruction.substr(0, instruction.find(" "));
-	string opperands = instruction.substr(opcode.size(), instruction.size());
-
-	// Check instructions with no opperands
-	if (opperands == "") {
-		return opcode;
-	}
-	
-	stringstream stream(opperands);
-	string opperand;
-
-	// Loop through all instruction opperands
-	while (stream.good()) {
-		getline(stream, opperand, ',');
-		opperand = trim(opperand);
-
-		if (opperand.substr(0, 2) == "#0") {
-			opperand = "num";
-		} else if (opperand.substr(0, 2) == "0x") {
-			opperand = "mem";
-		} else {
-			opperand = "reg";
-		}
-
-		opcode += "." + opperand;
-	}
-
-	return opcode;
-}
-
-/**
- * Loads all the grams we want to find
- */
-void loadGrams()
+// Loads all the grams we want to find
+/*void loadGrams()
 {
 	ifstream file("grams.txt");
 	string fileLine, sensor, gram;
@@ -67,43 +22,51 @@ void loadGrams()
 	// Loop though file
 	while (getline(file, fileLine)) {
 		istringstream stream(fileLine);
-		
+
 		getline(stream, sensor, ' ');
-		
+
 		// Loop to load grams
 		while (!stream.eof()) {
 			getline(stream, gram, ' ');
-			
+
 			grams[sensor].push_back(gram);
 		}
 	}
 
 	// Output grams
 	cout << "===== LOADED GRAMS =====" << endl;
-	
+
 	for (auto i = grams.begin(); i != grams.end(); i++) {
 		cout << i->first << endl;
-		
+
 		for (auto j = i->second.begin(); j != i->second.end(); j++) {
 			cout << "\t" << *j << endl;
 		}
 	}
 }
-
-/**
- * Start of program
- */
+*/
 int main()
 {
-	loadGrams();
-	
+	//loadGrams();
+
 	ifstream sample("sample.txt");
 	string fileLine, instructionGram;
 
+  std::vector<string> usedValues; //vector to keep track of values that have been seen
+  std::vector<instructionObj> objects; //vector to hold all of the instruction objects created
+  int object_number = 0;
 	while (getline(sample, fileLine)) {
-		instructionGram = createGram(fileLine);
-		
-		//todo: check grams
+    instructionObj foo(fileLine, object_number, usedValues);
+    objects.push_back(foo);
+    //std::cout << object_number << '\n'; //TEST
+	  //std::cout << usedValues.front() << '\n'; //TEST
+    //std::cout << foo.objGram<< '\n';  //TEST
+    //std::cout << foo.objOpCode<< '\n'; //TEST
+    //std::cout << objects.size()<< '\n'; //TEST
+    /*if(!foo.expressions.empty()){
+      std::cout << foo.expressions.front()<< '\n'; //TEST
+    }*/
+    object_number++;
 	}
 
 	// Cleanup
