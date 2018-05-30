@@ -53,7 +53,7 @@ int main()
 	string fileLine, instructionGram;
 
   std::vector<string> usedValues; //vector to keep track of values that have been seen
-  std::vector<instructionObj> objects; //vector to hold all of the instruction objects created
+  std::vector<Instruction> objects; //vector to hold all of the instruction objects created
   int object_number = 0;
 	while (getline(sample, fileLine)) {
     Instruction foo(fileLine, object_number, usedValues);

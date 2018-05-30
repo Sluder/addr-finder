@@ -7,6 +7,7 @@
 #include <utility>
 #include <regex>
 
+using namespace std;
 
 //INSTRUCTION OBJECT CLASS
 class Instruction{
