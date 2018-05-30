@@ -56,12 +56,12 @@ int main()
   std::vector<instructionObj> objects; //vector to hold all of the instruction objects created
   int object_number = 0;
 	while (getline(sample, fileLine)) {
-    instructionObj foo(fileLine, object_number, usedValues);
+    Instruction foo(fileLine, object_number, usedValues);
     objects.push_back(foo);
     //std::cout << object_number << '\n'; //TEST
 	  //std::cout << usedValues.front() << '\n'; //TEST
-    //std::cout << foo.objGram<< '\n';  //TEST
-    //std::cout << foo.objOpCode<< '\n'; //TEST
+    std::cout << foo.Gram<< '\n';  //TEST
+    std::cout << foo.opCode<< '\n'; //TEST
     //std::cout << objects.size()<< '\n'; //TEST
     /*if(!foo.expressions.empty()){
       std::cout << foo.expressions.front()<< '\n'; //TEST

@@ -7,35 +7,34 @@
 #include <utility>
 #include <regex>
 
-using namespace std;
 
 //INSTRUCTION OBJECT CLASS
-class instructionObj{
+class Instruction{
   //class type
   public:
 
   //instance variables
   std::vector<string> variables; //all variables in instruction line (ex: var1, var27, etc..)
   std::vector<string> values; //all values in instruction line (ex: 0x102a, #0x80, al)
-  string objOpCode; //this has strings in it (ex: lda.num.mem)
-  string objGram;  //this has variables in it (ex: bcc.Var1.Var27)
+  string opCode; //this has strings in it (ex: lda.num.mem)
+  string Gram;  //this has variables in it (ex: bcc.Var1.Var27)
   int objNumber; //distinguishes each object from one another
   bool noOperands; //distinuguishes if a instruction line has operands or not (ex: bcc[true] or lda al, 0x102f[false])
   std::vector<string> expressions; //if arithmetic is used in any operand, the expression is stored here
 
   //turn this into the object's constructor potentially
-  instructionObj(string& instruction, int& object_number,vector<string>& usedValues){
+  Instruction(string& instruction, int& object_number,vector<string>& usedValues){
     //set object's objNumber
     objNumber = object_number;
 
     //start filling object instances with file line data
     string opcode = instruction.substr(0, instruction.find(" "));
-    objGram = opcode;
+    Gram = opcode;
   	string operands = instruction.substr(opcode.size(), instruction.size());
     string operand;
   	// Check instructions with no operands
   	if (operands == "") {
-  		objOpCode = opcode;
+  		opCode = opcode;
       noOperands = true; //this instruction does not have operands
   	}else{
 
@@ -61,7 +60,7 @@ class instructionObj{
             //add operand to values array for current object (Needs updating)
             values.push_back(expression_value);
 
-            //USED FOR CREATING objGram
+            //USED FOR CREATING Gram
             //loop through usedValues vector to see if the operand has been used
             int position = find(usedValues.begin(), usedValues.end(), expression_value) - usedValues.begin();
             if (position < usedValues.size()){
@@ -78,9 +77,9 @@ class instructionObj{
               variables.push_back(expression_variable);
             }
             if (counter <= 0){
-              objGram += "." + expression_variable;
+              Gram += "." + expression_variable;
             }else{
-              objGram += " + " + expression_variable;
+              Gram += " + " + expression_variable;
             }
             counter++; //increment fo proper arithmetic symbol position
           }
@@ -90,7 +89,7 @@ class instructionObj{
           //add operand to values array for current object (Needs updating)
           values.push_back(operand);
 
-          //USED FOR CREATING objGram
+          //USED FOR CREATING Gram
           //loop through usedValues vector to see if the operand has been used
           int position = find(usedValues.begin(), usedValues.end(), operand) - usedValues.begin();
           if (position < usedValues.size()){
@@ -107,7 +106,7 @@ class instructionObj{
             variables.push_back(variable);
           }
 
-          //USED FOR CONSTRUCTING objOpCode
+          //USED FOR CONSTRUCTING opCode
           if (operand.substr(0, 2) == "#0") {
             operand = "num";
           } else if (operand.substr(0, 2) == "0x") {
@@ -115,19 +114,19 @@ class instructionObj{
           } else {
             operand = "reg";
           }
-          //start concatenating to create objGram
-          objGram += "." + variable;
+          //start concatenating to create Gram
+          Gram += "." + variable;
           //start concatenating to create opcode
           opcode += "." + operand;
 
-          //assign opcode to specific object's objGram
+          //assign opcode to specific object's Gram
         }
       }
-      objOpCode = opcode;
+      opCode = opcode;
       noOperands = false; //this instruction has operands
     }
   }
-  //Trim function used in instructionObj constructor
+  //Trim function used in Instruction constructor
   string trim(string& str)
   {
       size_t start = str.find_first_not_of(" ");
