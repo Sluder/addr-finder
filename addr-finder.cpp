@@ -7,8 +7,8 @@
 
 using namespace std;
 
-// Features loaded in from config
-map<string, vector<string>> grams;
+// Grams loaded in from config
+vector< vector<string> > grams;
 
 /**
  * Trim whitespace on string
@@ -29,7 +29,7 @@ string createGram(string& instruction)
 	string opcode = instruction.substr(0, instruction.find(" "));
 	string opperands = instruction.substr(opcode.size(), instruction.size());
 
-	// Check instructions with no opperands
+	// Checks instructions with no opperands
 	if (opperands == "") {
 		return opcode;
 	}
@@ -57,7 +57,7 @@ string createGram(string& instruction)
 }
 
 /**
- * Loads all the grams we want to find
+ * Loads all the grams from config
  */
 void loadGrams()
 {
@@ -87,7 +87,7 @@ void loadGrams()
 		for (auto j = i->second.begin(); j != i->second.end(); j++) {
 			cout << "\t" << *j << endl;
 		}
-	}
+	} 
 }
 
 /**
@@ -99,11 +99,17 @@ int main()
 	
 	ifstream sample("sample.txt");
 	string fileLine, instructionGram;
+	
+	vector<string> stack;
 
 	while (getline(sample, fileLine)) {
 		instructionGram = createGram(fileLine);
 		
-		//todo: check grams
+		for (auto i = grams.begin(); i != grams.end(); i++) {
+			for (auto j = i->second.begin(); j != i->second.end(); j++) {
+				cout << "\t" << *j << endl;
+			}
+		}
 	}
 
 	// Cleanup
