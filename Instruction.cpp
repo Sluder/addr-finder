@@ -33,7 +33,7 @@ Instruction::Instruction(string& instruction, vector<string>& usedValues)
 					expressionValue = trim(expressionValue);
 
 					expressionVariable = getVariable(operand, usedValues);
-					variables.push_back(expressionVariable);
+					this->variables.push_back(expressionVariable);
 
 					// Update gram representation
 					if (counter <= 0) {
@@ -47,7 +47,7 @@ Instruction::Instruction(string& instruction, vector<string>& usedValues)
 			// No arithmetic found
 			} else {
 				string variable = getVariable(operand, usedValues);
-				variables.push_back(variable);
+				this->variables.push_back(variable);
 
 				// Check substring for gram
 				if (operand.substr(0, 2) == "#0") {
@@ -66,7 +66,6 @@ Instruction::Instruction(string& instruction, vector<string>& usedValues)
 	// Set values for new instruction
 	this->opCode = opcode;
 	this->gram = gram;
-	this->variables = variables;
 }
 
 /**
