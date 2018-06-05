@@ -20,7 +20,7 @@ class Instruction {
 
 		Instruction(string& instruction, vector<string>& usedValues);
 
-		string getVariable(string operand, vector<string>& usedValues);
+		string getVariable(string& operand, vector<string>& usedValues);
 		string trim(string& str);
-		string getOperandType(string operand);
+		string getOperandType(string& operand);
 };

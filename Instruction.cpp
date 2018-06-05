@@ -33,10 +33,11 @@ Instruction::Instruction(string& instruction, vector<string>& usedValues)
 					getline(expStream, expressionValue, '+');
 					expressionValue = trim(expressionValue);
 
-					expressionVariable = getVariable(operand, usedValues);
+          expressionVariable = getVariable(operand, usedValues);
 					this->variables.push_back(expressionVariable);
 
           expressionOperandType = getOperandType(operand);
+
 
           // Update gram representation
 					if (counter <= 0) {
@@ -66,7 +67,7 @@ Instruction::Instruction(string& instruction, vector<string>& usedValues)
 /**
  * Checks if variable exists, if not start tracking it
  */
-string Instruction::getVariable(string operand, vector<string>& usedValues)
+string Instruction::getVariable(string& operand, vector<string>& usedValues)
 {
 	int position = find(usedValues.begin(), usedValues.end(), operand) - usedValues.begin();
 
@@ -91,9 +92,9 @@ string Instruction::trim(string& str)
 }
 
 /**
- * Gets the type of operand (ex: 0x102a, #0x80)
+ * Gets the type of operand 
  */
-string Instruction::getOperandType(string operand)
+string Instruction::getOperandType(string& operand)
 {
   // Check substring for gram
   if (operand.substr(0, 2) == "#0") {
