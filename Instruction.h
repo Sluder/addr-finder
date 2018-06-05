@@ -15,8 +15,8 @@ using namespace std;
 class Instruction {
 	public:
 		string opCode;
-		string gram;					// N-gram representation (Ex. lda.var1.var4)
-		vector<string> variables; 		// All variables in instruction (Ex: var27)
+		string gram;					// N-gram representation (Ex. lda.reg21.mem38)
+		vector<string> variables; 		// All variables in instruction (Ex: reg3, mem72)
 
 		Instruction(string& instruction, vector<string>& usedValues);
 
