@@ -14,12 +14,13 @@ using namespace std;
  */
 class Instruction {
 	public:
-		string opCode; 
+		string opCode;
 		string gram;					// N-gram representation (Ex. lda.var1.var4)
 		vector<string> variables; 		// All variables in instruction (Ex: var27)
-		
+
 		Instruction(string& instruction, vector<string>& usedValues);
-		
+
 		string getVariable(string operand, vector<string>& usedValues);
 		string trim(string& str);
+		string getOperandType(string operand);
 };

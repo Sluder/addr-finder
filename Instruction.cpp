@@ -1,7 +1,7 @@
 #include "Instruction.h"
 
 using namespace std;
- 		
+
 /**
  * Constructor
  */
@@ -21,11 +21,12 @@ Instruction::Instruction(string& instruction, vector<string>& usedValues)
 			getline(opStream, operand, ',');
 			operand = trim(operand);
 
-			// Check for arithmetic 
+			// Check for arithmetic
 			if (operand.find('+') != string::npos) {
 				stringstream expStream(operand);
 				string expressionValue;
-				string expressionVariable;
+				string expressionOperandType;
+        string expressionVariable;
 
 				counter = 0;
 				while (expStream.good()) {
@@ -35,11 +36,13 @@ Instruction::Instruction(string& instruction, vector<string>& usedValues)
 					expressionVariable = getVariable(operand, usedValues);
 					this->variables.push_back(expressionVariable);
 
-					// Update gram representation
+          expressionOperandType = getOperandType(operand);
+
+          // Update gram representation
 					if (counter <= 0) {
-						gram += "." + expressionVariable;
+						gram += "." + expressionOperandType + expressionVariable;
 					} else {
-						gram += "+" + expressionVariable;
+						gram += "+" + expressionOperandType + expressionVariable;
 					}
 
 					counter++;
@@ -47,19 +50,11 @@ Instruction::Instruction(string& instruction, vector<string>& usedValues)
 			// No arithmetic found
 			} else {
 				string variable = getVariable(operand, usedValues);
+        string operandType = getOperandType(operand);
 				this->variables.push_back(variable);
 
-				// Check substring for gram
-				if (operand.substr(0, 2) == "#0") {
-					operand = "con";
-				} else if (operand.substr(0, 2) == "0x") {
-					operand = "mem";
-				} else {
-					operand = "reg";
-				}
-
-				gram += "." + variable;
-			}	
+				gram += "." + operandType + variable;
+			}
 		}
 	}
 
@@ -76,12 +71,12 @@ string Instruction::getVariable(string operand, vector<string>& usedValues)
 	int position = find(usedValues.begin(), usedValues.end(), operand) - usedValues.begin();
 
 	if (position < usedValues.size()) {
-		return "var" + to_string(position);
-	} 
+		return to_string(position);
+	}
 
 	usedValues.push_back(operand);
 
-	return "var" + to_string(usedValues.size() - 1);
+	return to_string(usedValues.size() - 1);
 }
 
 /**
@@ -93,4 +88,20 @@ string Instruction::trim(string& str)
 	size_t end = str.find_last_not_of(" ");
 
 	return str.substr(start, end - start + 1);
+}
+
+/**
+ * Gets the type of operand (ex: 0x102a, #0x80)
+ */
+string Instruction::getOperandType(string operand)
+{
+  // Check substring for gram
+  if (operand.substr(0, 2) == "#0") {
+    operand = "con";
+  } else if (operand.substr(0, 2) == "0x") {
+    operand = "mem";
+  } else {
+    operand = "reg";
+  }
+  return operand;
 }
