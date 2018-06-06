@@ -50,9 +50,7 @@ int main()
 	while (getline(sample, fileLine)) {
 		Instruction tmp(fileLine, usedValues);
 		
-		bool found = inConfig(tmp.variables);
-		
-		if (found) {
+		if (inConfig(tmp.variables)) {
 			cout << tmp.gram << endl;
 		}
 	}
