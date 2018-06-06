@@ -1,0 +1,2 @@
+battery_voltage 102f
+vehicle_speed 1071
