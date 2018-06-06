@@ -16,11 +16,11 @@ class Instruction {
 	public:
 		string opCode;
 		string gram;					// N-gram representation (Ex. lda.reg21.mem38)
-		vector<string> variables; 		// All variables in instruction (Ex: reg3, mem72)
+		vector<int> variables; 		// All variables in instruction (Ex: reg3, mem72)
 
 		Instruction(string& instruction, vector<string>& usedValues);
 
-		string getVariable(string& operand, vector<string>& usedValues);
+		int getVariable(string& operand, vector<string>& usedValues);
 		string trim(string& str);
 		string getOperandType(string& operand);
 };

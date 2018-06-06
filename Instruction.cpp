@@ -26,7 +26,7 @@ Instruction::Instruction(string& instruction, vector<string>& usedValues)
 				stringstream expStream(operand);
 				string expressionValue;
 				string expressionOperandType;
-				string expressionVariable;
+				int expressionVariable;
 
 				counter = 0;
 				while (expStream.good()) {
@@ -41,21 +41,21 @@ Instruction::Instruction(string& instruction, vector<string>& usedValues)
 
 					// Update gram representation
 					if (counter <= 0) {
-						gram += "." + expressionOperandType + expressionVariable;
+						gram += "." + expressionOperandType + to_string(expressionVariable);
 					} else {
-						gram += "+" + expressionOperandType + expressionVariable;
+						gram += "+" + expressionOperandType + to_string(expressionVariable);
 					}
 
 					counter++;
 				}
 			// No arithmetic found
 			} else {
-				string variable = getVariable(operand, usedValues);
+				int variable = getVariable(operand, usedValues);
 				string operandType = getOperandType(operand);
 				
 				this->variables.push_back(variable);
 
-				gram += "." + operandType + variable;
+				gram += "." + operandType + to_string(variable);
 			}
 		}
 	}
@@ -68,36 +68,39 @@ Instruction::Instruction(string& instruction, vector<string>& usedValues)
 /**
  * Checks if variable exists, if not start tracking it
  */
-string Instruction::getVariable(string& operand, vector<string>& usedValues)
+int Instruction::getVariable(string& operand, vector<string>& usedValues)
 {
 	int position = find(usedValues.begin(), usedValues.end(), operand) - usedValues.begin();
 
 	if (position < usedValues.size()) {
-		return to_string(position);
+		return position;
 	}
 
 	usedValues.push_back(operand);
 
-	return to_string(usedValues.size() - 1);
+	return usedValues.size() - 1;
 }
 
 /**
- * Removes spaces on string ends
+ * Removes unwated chars on str
  */
 string Instruction::trim(string& str)
 {
 	size_t start = str.find_first_not_of(" ");
 	size_t end = str.find_last_not_of(" ");
 
+	str.erase(remove(str.begin(), str.end(), '\t'), str.end());
+	str.erase(remove(str.begin(), str.end(), '\r'), str.end());
+	str.erase(remove(str.begin(), str.end(), '\n'), str.end());
+	
 	return str.substr(start, end - start + 1);
 }
 
 /**
- * Gets the type of operand 
+ * Gets the type of operand for gram
  */
 string Instruction::getOperandType(string& operand)
 {
-	// Check substring for gram
 	if (operand.substr(0, 2) == "#0") {
 		return "con";
 	} else if (operand.substr(0, 2) == "0x") {
