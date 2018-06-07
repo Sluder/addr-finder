@@ -7,51 +7,94 @@
 
 using namespace std;
 
-map<string, string> config;				// Defined sensor addresses
-vector<vector<Instruction>> features;	// Container for found features
-vector<string> usedValues;				// Values already found & used
+map<string, string> config;								// Defined sensor addresses
+multimap<int, vector<Instruction>> control_features;	// Container for found features
+vector<string> usedValues;								// Values already found & used
+
+const int WINDOW_SIZE = 2;								// # of instructions to pull for feature
 
 /**
  * Loads sensor address config
  */
-void loadConfig()
+void loadConfig(string fileName)
 {
-	ifstream file("config.txt");
+	ifstream file(fileName);
 	string sensor, addr;
 	
 	while (file >> sensor >> addr) {
-		config[sensor] = "0x" + addr;
+		if (addr.substr(0, 2) != "0x") {
+			addr = "0x" + addr;
+		}
+		config[sensor] = addr;
 	}
 }
 
 /**
  * Checks if instruction operands contain a sensor address
+ * Returns index of sensor if found, -1 if not
  */
-bool inConfig(vector<int> variables)
+int inConfig(vector<int> variables)
 {
+	map<string, string>::iterator it;
+	
 	for (int variable : variables) {
-		for (auto const& i : config) {
-			if (i.second == usedValues.at(variable)) {
-				return true;
+		for (it = config.begin(); it != config.end(); it++) {
+			if (it->second == usedValues.at(variable)) {
+				return distance(config.begin(),it);
 			}
 		}
 	}
-	
-	return false;
+
+	return -1;
 }
 
-int main()
+/**
+ * Start of program
+ */
+int main(int argc, char* argv[])
 {
-	loadConfig();
+	// Check args
+	if (argc != 4) {
+		cout << "Please run with args (./a.out config.txt control.txt ecu.txt)" << endl;
+		return 0;
+	}
 	
-	ifstream sample("sample.txt");
+	loadConfig(argv[1]);
+	
+	ifstream controlFile(argv[2]);
 	string fileLine;
 	
-	while (getline(sample, fileLine)) {
+	// Loop through instructions to find sensors
+	while (getline(controlFile, fileLine)) {
 		Instruction tmp(fileLine, usedValues);
-		
-		if (inConfig(tmp.variables)) {
-			cout << tmp.gram << endl;
+		int index, instructionCount = 0;
+
+		index = inConfig(tmp.variables);
+
+		// If operands contain an address
+		if (index >= 0) {
+			vector<Instruction> container;
+			container.push_back(tmp);
+
+			// Grab grams to create feature
+			while (instructionCount < WINDOW_SIZE) {
+				getline(controlFile, fileLine);
+				
+				Instruction tmp2(fileLine, usedValues);
+				container.push_back(tmp2);
+
+				// Reset counter if sensor appears in window
+				if (inConfig(tmp2.variables) >= 0) {
+					instructionCount = 0;
+				} else {
+					instructionCount++;
+				}
+			}
+			
+			// Finish & reset
+			control_features.insert(make_pair(index, container));
+			instructionCount = 0;
+			container.clear();
 		}
 	}
 	
