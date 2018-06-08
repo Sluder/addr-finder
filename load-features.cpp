@@ -8,30 +8,14 @@
 using namespace std;
 
 map<string, string> config;								// Defined sensor addresses
-multimap<int, vector<Instruction>> control_features;	// Container for found features
+multimap<int, vector<Instruction>> controlFeatures;		// Container for found features
 vector<string> usedValues;								// Values already found & used
 
 const int WINDOW_SIZE = 2;								// # of instructions to pull for feature
 
 /**
- * Loads sensor address config
- */
-void loadConfig(string fileName)
-{
-	ifstream file(fileName);
-	string sensor, addr;
-	
-	while (file >> sensor >> addr) {
-		if (addr.substr(0, 2) != "0x") {
-			addr = "0x" + addr;
-		}
-		config[sensor] = addr;
-	}
-}
-
-/**
  * Checks if instruction operands contain a sensor address
- * Returns index of sensor if found, -1 if not
+ * returns : index of sensor if found, -1 if not
  */
 int inConfig(vector<int> variables)
 {
@@ -49,20 +33,43 @@ int inConfig(vector<int> variables)
 }
 
 /**
- * Start of program
+ * Loads sensor address config
  */
-int main(int argc, char* argv[])
+bool loadConfig(string fileName)
 {
-	// Check args
-	if (argc != 4) {
-		cout << "Please run with args (./a.out config.txt control.txt ecu.txt)" << endl;
-		return 0;
+	ifstream configFile(fileName);
+	string sensor, addr;
+	
+	// Check if file was successfully opened
+	if (configFile.fail()) {
+		return false;
 	}
 	
-	loadConfig(argv[1]);
+	while (configFile >> sensor >> addr) {
+		if (addr.substr(0, 2) != "0x") {
+			addr = "0x" + addr;
+		}
+		config[sensor] = addr;
+	}
 	
-	ifstream controlFile(argv[2]);
+	configFile.close();
+	
+	return true;
+}
+
+/**
+ * Loads control features
+ * returns : if success or not
+ */
+bool loadControlFeatures(string fileName)
+{
+	ifstream controlFile(fileName);
 	string fileLine;
+	
+	// Check if file was successfully opened
+	if (controlFile.fail()) {
+		return false;
+	}
 	
 	// Loop through instructions to find sensors
 	while (getline(controlFile, fileLine)) {
@@ -82,6 +89,8 @@ int main(int argc, char* argv[])
 				
 				Instruction tmp2(fileLine, usedValues);
 				container.push_back(tmp2);
+				
+				cout << tmp2.gramSimple << endl;
 
 				// Reset counter if sensor appears in window
 				if (inConfig(tmp2.variables) >= 0) {
@@ -92,10 +101,33 @@ int main(int argc, char* argv[])
 			}
 			
 			// Finish & reset
-			control_features.insert(make_pair(index, container));
+			controlFeatures.insert(make_pair(index, container));
 			instructionCount = 0;
 			container.clear();
 		}
+	}
+	
+	controlFile.close();
+	
+	return true;
+}
+
+/**
+ * Start of program
+ */
+int main(int argc, char* argv[])
+{
+	if (argc != 4) {
+		cout << "Please run with args (./a.out config.txt control.txt ecu.txt)" << endl;
+		return 0;
+	}
+	
+	// Load everything & check for issues
+	if (!loadConfig(argv[1])) {
+		cout << "Failed to open file " << argv[1] << endl;
+
+	} else if (!loadControlFeatures(argv[2])) {
+		cout << "Failed to open file " << argv[2] << endl;
 	}
 	
 	return 0;
