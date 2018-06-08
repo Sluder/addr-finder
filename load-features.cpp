@@ -15,7 +15,7 @@ const int WINDOW_SIZE = 2;								// # of instructions to pull for feature
 
 /**
  * Checks if instruction operands contain a sensor address
- * returns : index of sensor if found, -1 if not
+ * return : index of sensor if found, -1 if not
  */
 int inConfig(vector<int> variables)
 {
@@ -59,7 +59,7 @@ bool loadConfig(string fileName)
 
 /**
  * Loads control features
- * returns : if success or not
+ * return : if success or not
  */
 bool loadControlFeatures(string fileName)
 {
