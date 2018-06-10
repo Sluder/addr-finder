@@ -4,7 +4,7 @@
 #include <string>
 
 #include "Instruction.h"
-#include "Control.h"
+#include "ControlFile.h"
 
 using namespace std;
 

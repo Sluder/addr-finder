@@ -4,7 +4,7 @@
 #include <map>
 #include <vector>
 
-#include "Control.h"
+#include "ControlFile.h"
 #include "Instruction.h"
 
 using namespace std;
