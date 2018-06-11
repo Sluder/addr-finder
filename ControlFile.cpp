@@ -12,8 +12,8 @@ using namespace std;
 map<string, string> config;								// Configuration for sensor addresses
 multimap<int, vector<Instruction>> controlFeatures;		// Container for found features
 
-extern vector<string> usedValues;
-extern int WINDOW_SIZE;
+extern vector<string> usedValues;						// Defined in Main.cpp
+extern int WINDOW_SIZE;									// Defined in Main.cpp
 
 /**
  * Loads sensor address config
@@ -37,7 +37,7 @@ bool loadConfig(string fileName)
 	}
 	
 	configFile.close();
-	cout << "[success] Loaded config" << endl;
+	cout << "[success] Loaded sensor config" << endl;
 	
 	return true;
 }
@@ -52,10 +52,8 @@ int inConfig(vector<int> variables)
 		return -1;
 	}
 	
-	map<string, string>::iterator it;
-	
 	for (int variable : variables) {
-		for (it = config.begin(); it != config.end(); it++) {
+		for (map<string, string>::iterator it = config.begin(); it != config.end(); it++) {
 			if (it->second == usedValues.at(variable)) {
 				return distance(config.begin(), it);
 			}

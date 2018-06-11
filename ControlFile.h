@@ -1,14 +1,9 @@
 #pragma once
 
-using namespace std;
+bool loadConfig(std::string fileName);
 
-/**
- * Function declarations
- */
-bool loadConfig(string fileName);
+bool loadControlFeatures(std::string fileName);
 
-bool loadControlFeatures(string fileName);
-
-int inConfig(vector<int> variables);
+int inConfig(std::vector<int> variables);
 
 void printControlFeatures();

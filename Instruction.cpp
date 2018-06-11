@@ -2,6 +2,8 @@
 
 using namespace std;
 
+extern vector<string> usedValues;			// Defined in Main.cpp
+
 /**
  * Constructor
  */
@@ -113,4 +115,14 @@ string Instruction::getOperandType(string& operand)
 	}
 
 	return "reg";
+}
+
+/**
+ * Print variables for operands
+ */
+void Instruction::printVariables()
+{
+	for (int i = 0; i < this->variables.size(); i++) {
+		cout << usedValues[this->variables[i]] << endl;
+	}
 }
