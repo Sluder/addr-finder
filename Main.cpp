@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <map>
 
 #include "Instruction.h"
 #include "ControlFile.h"
@@ -39,10 +40,10 @@ int main(int argc, char* argv[])
 	} else {
 		cout << endl;
 
-		//printControlFeatures();	
+		//printControlFeatures();
 
 		searchEcuFeatures();
 	}
-	
+
 	return 0;
 }

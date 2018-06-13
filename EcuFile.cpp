@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <map>
 
 #include "EcuFile.h"
 #include "ControlFile.h"
@@ -22,19 +23,19 @@ bool loadEcuInstructions(string fileName)
 {
 	ifstream ecuFile(fileName);
 	string fileLine;
-	
+
 	// Check if file was successfully opened
 	if (ecuFile.fail()) {
 		return false;
 	}
-	
+
 	while (getline(ecuFile, fileLine)) {
 		ecuInstructions.push_back(Instruction(fileLine, usedValues));
 	}
-	
+
 	ecuFile.close();
 	cout << "[success] Loaded ECU instructions" << endl;
-	
+
 	return true;
 }
 
@@ -46,7 +47,7 @@ void searchEcuFeatures()
 	for (int i = 0; i < ecuInstructions.size(); i++) {
 		for (auto j : controlFeatures) {
 			bool matches = true;
-			
+
 			// Instruction matches first item in feature
 			if (ecuInstructions[i].gramSimple == j.second.front().gramSimple) {
 				for (int k = 0; k < WINDOW_SIZE; k++) {
@@ -56,16 +57,16 @@ void searchEcuFeatures()
                         break;
                     }
                 }
-                
+
                 // Output found feature
                 if (matches) {
 					cout << "Found feature" << endl;
-					
+
                     for (int x = 0; x <= WINDOW_SIZE; x++) {
                         cout << '\t' << ecuInstructions[i + x].gramSimple << endl;
                     }
                     cout << endl;
-					
+
 					break;
                 }
 			}
