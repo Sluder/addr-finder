@@ -10,9 +10,9 @@
 using namespace std;
 
 vector<Instruction> ecuInstructions;
-vector<string> possibleSensors;
-string sensorAddress;
-int sensorCounter;
+vector<string> possibleSensors; // All operands in the features
+string sensorAddress; // Final sensor address to be found
+int sensorCounter;	// Number of times sensor occurs in the features
 
 extern vector<string> usedValues;
 extern multimap<int, vector<Instruction>> controlFeatures;
@@ -78,7 +78,7 @@ void searchEcuFeatures()
 			}
 		}
 	}
-	//count number of occurences of each operand
+	// Count the number of occurences of each operand and find the one with the most occurences
 	sensorCounter = 0;
 	int tmpCount = 0;
 	for (int j = 0; j < possibleSensors.size(); j++){
@@ -90,6 +90,7 @@ void searchEcuFeatures()
 			}
 		}
 	}
+	// Output sensorAddress and number of occurences
 	cout << "The found Sensor is: " << sensorAddress << endl;
 	cout << endl;
 	cout << "It occured " << sensorCounter << " times" << endl;
