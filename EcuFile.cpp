@@ -10,6 +10,9 @@
 using namespace std;
 
 vector<Instruction> ecuInstructions;
+vector<string> possibleSensors;
+string sensorAddress;
+int sensorCounter;
 
 extern vector<string> usedValues;
 extern multimap<int, vector<Instruction>> controlFeatures;
@@ -63,7 +66,10 @@ void searchEcuFeatures()
 					cout << "Found feature" << endl;
 
                     for (int x = 0; x <= WINDOW_SIZE; x++) {
-                        cout << '\t' << ecuInstructions[i + x].gramSimple << endl;
+												cout << '\t' << ecuInstructions[i + x].gramSimple << endl;
+												for (int z = 0; z < ecuInstructions[i+x].listOfOperands.size(); z++){
+													possibleSensors.push_back(ecuInstructions[i+x].listOfOperands.at(z));
+												}
                     }
                     cout << endl;
 
@@ -72,4 +78,20 @@ void searchEcuFeatures()
 			}
 		}
 	}
+	//count number of occurences of each operand
+	sensorCounter = 0;
+	int tmpCount = 0;
+	for (int j = 0; j < possibleSensors.size(); j++){
+		if (possibleSensors.at(j).substr(0, 2) == "0x"){
+			tmpCount = count(possibleSensors.begin(), possibleSensors.end(), possibleSensors.at(j));
+			if (tmpCount > sensorCounter){
+				sensorCounter = tmpCount;
+				sensorAddress = possibleSensors.at(j);
+			}
+		}
+	}
+	cout << "The found Sensor is: " << sensorAddress << endl;
+	cout << endl;
+	cout << "It occured " << sensorCounter << " times" << endl;
+	cout << endl;
 }

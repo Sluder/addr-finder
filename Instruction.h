@@ -18,15 +18,16 @@ class Instruction {
 		string gram;					// Gram representation (Ex. lda.reg21.mem38)
 		string gramSimple;				// Generic gram representation (Ex. lda.reg.mem)
 		vector<int> variables; 			// Indexes of all variables in instruction
+		vector<string> listOfOperands;
 
 		Instruction(string& instruction, vector<string>& usedValues);
 
 		int getVariable(string& operand, vector<string>& usedValues);
-		
+
 		string getOperandType(string& operand);
-		
+
 		void printVariables();
-		
+
 	private:
 		string trim(string& str);
 };

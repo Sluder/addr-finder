@@ -13,6 +13,7 @@ Instruction::Instruction(string& instruction, vector<string>& usedValues)
 	string operands = instruction.substr(opcode.size(), instruction.size());
 	string gram = opcode;
 	string gramSimple = opcode;
+	vector<string> listOfOperands;
 
 	// Cycle through opperands if they exist
 	if (operands != "") {
@@ -21,10 +22,11 @@ Instruction::Instruction(string& instruction, vector<string>& usedValues)
 		int counter;
 		while (opStream.good()) {
 			string operand;
-			
+
 			getline(opStream, operand, ',');
 			operand = trim(operand);
-			
+			listOfOperands.push_back(operand); //add each operand to the list
+
 			// Check for arithmetic
 			if (operand.find('+') != string::npos) {
 				stringstream expStream(operand);
@@ -57,7 +59,7 @@ Instruction::Instruction(string& instruction, vector<string>& usedValues)
 			} else {
 				int variable = getVariable(operand, usedValues);
 				string operandType = getOperandType(operand);
-				
+
 				this->variables.push_back(variable);
 
 				gram += "." + operandType + to_string(variable);
@@ -70,6 +72,7 @@ Instruction::Instruction(string& instruction, vector<string>& usedValues)
 	this->opCode = opcode;
 	this->gram = gram;
 	this->gramSimple = gramSimple;
+	this->listOfOperands = listOfOperands;
 }
 
 /**
@@ -99,7 +102,7 @@ string Instruction::trim(string& str)
 	str.erase(remove(str.begin(), str.end(), '\t'), str.end());
 	str.erase(remove(str.begin(), str.end(), '\r'), str.end());
 	str.erase(remove(str.begin(), str.end(), '\n'), str.end());
-	
+
 	return str.substr(start, end - start + 1);
 }
 
