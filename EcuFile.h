@@ -3,3 +3,5 @@
 bool loadEcuInstructions(std::string fileName);
 
 void searchEcuFeatures();
+
+void outputResults();

@@ -10,9 +10,7 @@
 using namespace std;
 
 vector<Instruction> ecuInstructions;
-vector<string> possibleSensors; // All operands in the features
-string sensorAddress; // Final sensor address to be found
-int sensorCounter;	// Number of times sensor occurs in the features
+multimap<int, string> possibleSensors;
 
 extern vector<string> usedValues;
 extern multimap<int, vector<Instruction>> controlFeatures;
@@ -47,6 +45,8 @@ bool loadEcuInstructions(string fileName)
  */
 void searchEcuFeatures()
 {
+	int sensorCounter = 0;
+	
 	for (int i = 0; i < ecuInstructions.size(); i++) {
 		for (auto j : controlFeatures) {
 			bool matches = true;
@@ -61,38 +61,38 @@ void searchEcuFeatures()
                     }
                 }
 
-                // Output found feature
+                // Operate on found feature
                 if (matches) {
-					cout << "Found feature" << endl;
-
                     for (int x = 0; x <= WINDOW_SIZE; x++) {
-												cout << '\t' << ecuInstructions[i + x].gramSimple << endl;
-												for (int z = 0; z < ecuInstructions[i+x].listOfOperands.size(); z++){
-													possibleSensors.push_back(ecuInstructions[i+x].listOfOperands.at(z));
-												}
+						for (int z = 0; z < ecuInstructions[i + x].listOfOperands.size(); z++) {
+							// Save possible sensor addresses
+							if (ecuInstructions[i + x].listOfOperands.at(z).substr(0, 2) == "0x") {
+								possibleSensors.emplace(j.first, ecuInstructions[i + x].listOfOperands.at(z)));
+							}
+						}
                     }
-                    cout << endl;
-
-					break;
-                }
+                } // end if
 			}
-		}
+		} //end j for
 	}
+	
+	outputResults();
+}
+
+/**
+ * Output possible sensor addresses
+ */
+void outputResults()
+{
 	// Count the number of occurences of each operand and find the one with the most occurences
-	sensorCounter = 0;
-	int tmpCount = 0;
-	for (int j = 0; j < possibleSensors.size(); j++){
-		if (possibleSensors.at(j).substr(0, 2) == "0x"){
-			tmpCount = count(possibleSensors.begin(), possibleSensors.end(), possibleSensors.at(j));
+	/* for (int j = 0; j < possibleSensors.size(); j++) {
+		if (possibleSensors.[j].substr(0, 2) == "0x") {
+			int tmpCount = count(possibleSensors.begin(), possibleSensors.end(), possibleSensors.at(j));
+			
 			if (tmpCount > sensorCounter){
 				sensorCounter = tmpCount;
 				sensorAddress = possibleSensors.at(j);
 			}
 		}
-	}
-	// Output sensorAddress and number of occurences
-	cout << "The found Sensor is: " << sensorAddress << endl;
-	cout << endl;
-	cout << "It occured " << sensorCounter << " times" << endl;
-	cout << endl;
+	} */
 }

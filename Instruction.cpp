@@ -19,22 +19,21 @@ Instruction::Instruction(string& instruction, vector<string>& usedValues)
 	if (operands != "") {
 		stringstream opStream(operands);
 
-		int counter;
 		while (opStream.good()) {
 			string operand;
 
 			getline(opStream, operand, ',');
 			operand = trim(operand);
-			listOfOperands.push_back(operand); //add each operand to the list
+			listOfOperands.push_back(operand);
 
-			// Check for arithmetic
+			// Check for arithmetic in operand
 			if (operand.find('+') != string::npos) {
 				stringstream expStream(operand);
 				string expressionValue;
 				string expressionOperandType;
 				int expressionVariable;
 
-				counter = 0;
+				int counter = 0;
 				while (expStream.good()) {
 					getline(expStream, expressionValue, '+');
 					expressionValue = trim(expressionValue);
