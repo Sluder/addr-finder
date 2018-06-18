@@ -9,12 +9,13 @@
 
 using namespace std;
 
-vector<Instruction> ecuInstructions;
-multimap<int, string> possibleSensors;
+extern map<string, string> config;							// Defined in ControlFile.cpp
+extern multimap<int, vector<Instruction>> controlFeatures;	
+extern vector<string> usedValues;							// Defined in Main.cpp
+extern int WINDOW_SIZE;									
 
-extern vector<string> usedValues;
-extern multimap<int, vector<Instruction>> controlFeatures;
-extern int WINDOW_SIZE;
+vector<Instruction> ecuInstructions;
+vector<vector<string>> possibleSensors(config.size());
 
 /**
  * Loads instructions from file in question
@@ -45,12 +46,11 @@ bool loadEcuInstructions(string fileName)
  */
 void searchEcuFeatures()
 {
-	int sensorCounter = 0;
-	
 	for (int i = 0; i < ecuInstructions.size(); i++) {
 		for (auto j : controlFeatures) {
 			bool matches = true;
-
+			possibleSensors.push_back(vector<string>());
+			
 			// Instruction matches first item in feature
 			if (ecuInstructions[i].gramSimple == j.second.front().gramSimple) {
 				for (int k = 0; k < WINDOW_SIZE; k++) {
@@ -63,14 +63,12 @@ void searchEcuFeatures()
 
                 // Operate on found feature
                 if (matches) {
-                    for (int x = 0; x <= WINDOW_SIZE; x++) {
-						for (int z = 0; z < ecuInstructions[i + x].listOfOperands.size(); z++) {
-							// Save possible sensor addresses
-							if (ecuInstructions[i + x].listOfOperands.at(z).substr(0, 2) == "0x") {
-								possibleSensors.emplace(j.first, ecuInstructions[i + x].listOfOperands.at(z)));
-							}
+					for (int z = 0; z < ecuInstructions[i].listOfOperands.size(); z++) {
+						// Save possible sensor addresses
+						if (ecuInstructions[i].listOfOperands.at(z).substr(0, 2) == "0x") {
+							possibleSensors[j.first].push_back(ecuInstructions[i].listOfOperands.at(z));
 						}
-                    }
+					}
                 } // end if
 			}
 		} //end j for
@@ -84,15 +82,30 @@ void searchEcuFeatures()
  */
 void outputResults()
 {
-	// Count the number of occurences of each operand and find the one with the most occurences
-	/* for (int j = 0; j < possibleSensors.size(); j++) {
-		if (possibleSensors.[j].substr(0, 2) == "0x") {
-			int tmpCount = count(possibleSensors.begin(), possibleSensors.end(), possibleSensors.at(j));
+	map<string, int> counters;
+	
+	// Loop through config
+	for (map<string, string>::iterator it = config.begin(); it != config.end(); it++) {
+		string maxAddr;
+		int maxCount = 0;
+		
+		// Check for empty possible sensors
+		if (possibleSensors[distance(config.begin(), it)].empty()) {
+			printf("%-15s : %-15s\n",  it->first.c_str(), "Not found");
+			continue;
+		}
+
+		// Figure out sensor counts
+		for (int i = 0; i < possibleSensors[distance(config.begin(), it)].size(); i++) {
+			counters[possibleSensors[distance(config.begin(), it)][i]]++;
 			
-			if (tmpCount > sensorCounter){
-				sensorCounter = tmpCount;
-				sensorAddress = possibleSensors.at(j);
+			if (counters[possibleSensors[distance(config.begin(), it)][i]] > maxCount) {
+				maxAddr = possibleSensors[distance(config.begin(), it)][i];
+				maxCount = counters[possibleSensors[distance(config.begin(), it)][i]];
 			}
 		}
-	} */
+		
+		printf("%-15s : %-15s\n", it->first.c_str(), maxAddr.c_str());
+		counters.clear();
+	}
 }

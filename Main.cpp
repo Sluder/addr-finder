@@ -10,12 +10,12 @@
 
 using namespace std;
 
-vector<string> usedValues;										// Values already found & used
-extern const int WINDOW_SIZE = 2;								// # of instructions to pull for feature
-
 extern map<string, string> config;								// Defined in ControlFile.cpp
 extern multimap<int, vector<Instruction>> controlFeatures;		// Defined in ControlFile.cpp
 extern vector<Instruction> ecuInstructions;						// Defined in EcuFile.cpp
+
+vector<string> usedValues;										// Values already found & used
+extern const int WINDOW_SIZE = 2;								// # of instructions to pull for feature
 
 /**
  * Start of program
@@ -40,9 +40,10 @@ int main(int argc, char* argv[])
 	} else {
 		cout << endl;
 
-		//printControlFeatures();
-
 		searchEcuFeatures();
+		
+		// DEBUGGING
+		//printControlFeatures();
 	}
 
 	return 0;

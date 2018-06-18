@@ -9,11 +9,11 @@
 
 using namespace std;
 
+extern vector<string> usedValues;						// Defined in Main.cpp
+extern int WINDOW_SIZE;
+
 map<string, string> config;								// Configuration for sensor addresses
 multimap<int, vector<Instruction>> controlFeatures;		// Container for found features
-
-extern vector<string> usedValues;						// Defined in Main.cpp
-extern int WINDOW_SIZE;									// Defined in Main.cpp
 
 /**
  * Loads sensor address config
@@ -112,7 +112,6 @@ bool loadControlFeatures(string fileName)
 	}
 	
 	controlFile.close();
-	
 	cout << "[success] Loaded control features" << endl;
 	
 	return true;

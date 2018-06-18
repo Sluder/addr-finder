@@ -91,7 +91,7 @@ int Instruction::getVariable(string& operand, vector<string>& usedValues)
 }
 
 /**
- * Removes unwated chars on str
+ * Removes unwanted chars on str
  */
 string Instruction::trim(string& str)
 {
