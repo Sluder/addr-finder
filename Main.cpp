@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
 		searchEcuFeatures();
 		
 		// DEBUGGING
-		//printControlFeatures();
+		printControlFeatures();
 	}
 
 	return 0;
