@@ -7,7 +7,7 @@ import os
 config = {}
 
 class EcuFile:
-    branch_opcodes = []
+    branch_opcodes = ["jmp", "bra", "jsr", "bbc", "bbs", "bcc", "bcs", "bne", "beq", "bpl", "bmi", "bvc", "bvs"]
 
     def __init__(self, file_name, is_control=False):
         """
@@ -32,21 +32,68 @@ class EcuFile:
         with open(file_name, "r") as file:
             for file_line in file:
                 file_line = file_line.strip()
+                file_line = [i.replace(",", "") for i in file_line.split()]
 
                 if not file_line:
                     continue
 
-                file_line = file_line.split()
+                # Find instructions that contain the config sensor addresses
+                for operand in file_line[1:]:
+                    sensor = self._config_sensor(file_line[1:])
+
+                    if sensor is not None:
+                        instruction = Instruction(file_line)
+
+    def _config_sensor(self, file_line):
+        """
+        Gets the sensor if instruction contains a sensor address that appears in sensor config
+        :param file_line: array of split instruction line
+        :return: sensor address if found (Ex: battery_voltage), None if not
+        """
+        for operand in file_line:
+            for sensor, address in config.items():
+                if operand == address and get_operand_type(operand) == "mem":
+                    return sensor
+        return None
 
     def _load_experimental_features(self, file_name):
-        print("exp")
+        """
+        Loads experimental file features
+        :param file_name: ECU file containing instructions
+        """
+        pass
 
 class Instruction:
     def __init__(self, file_line):
-        print(file_line)
+        """
+        Instruction constructor
+        :param file_line: array of split instruction line
+        """
+        self.opcode = file_line[0]
+        self.gram = self.opcode
+
+        for i in range(len(file_line[1:])):
+            operand = file_line[i + 1]
+
+            if operand in ["+", "-"]:
+                print(operand)
+            else:
+                self.gram += "." + get_operand_type(operand)
 
     def __str__(self):
         pass
+
+def get_operand_type(operand):
+    """
+    Gets the operand type for an instruction
+    :param operand: operand string (Ex: 0x102f, al)
+    :return: type of operand (Ex. 0x102f => mem)
+    """
+    if operand.startswith("#0"):
+        return "con"
+    elif operand.startswith("0x"):
+        return "mem"
+    return "reg"
 
 def load_config(file_name):
     """
@@ -57,9 +104,14 @@ def load_config(file_name):
         with open(file_name, "r") as file:
             for file_line in file:
                 file_line = file_line.strip()
+                file_line = file_line.split()
 
                 if not file_line:
                     continue
+
+                # Format sensor addresses
+                if not file_line[1].startswith("0x"):
+                    file_line[1] = "0x" + file_line[1]
 
                 config[file_line[0]] = file_line[1]
         print("[success] Loaded config")
@@ -75,7 +127,6 @@ def main(argv):
     load_config(argv[0])
 
     control_file = EcuFile(argv[1], True)
-    exp_file = EcuFile(argv[2])
 
 if __name__ == "__main__":
     main(sys.argv[1:])
