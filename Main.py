@@ -29,6 +29,8 @@ class EcuFile:
         Loads control file features
         :param file_name: ECU control file name
         """
+        self.features = {}
+
         with open(file_name, "r") as file:
             for file_line in file:
                 file_line = file_line.strip()
@@ -42,7 +44,14 @@ class EcuFile:
                     sensor = self._config_sensor(file_line[1:])
 
                     if sensor is not None:
-                        instruction = Instruction(file_line)
+                        while True:
+                            instruction = Instruction(file_line)
+
+                            file_line = file.next()
+                            sensor = self._config_sensor(file_line[1:])
+
+                            if sensor is None:
+                                break
 
     def _config_sensor(self, file_line):
         """
