@@ -45,13 +45,15 @@ class EcuFile:
 
                 # Found instruction with sensor address
                 if sensor is not None:
-                    file_lines[i] = format_line(file_lines[i])
-                    features.append(Instruction(file_lines[i]))
-
                     # Grab instructions that contain branch instructions
-                    while file_lines[i + 1][0] in branch_opcodes:
-                        features.append(Instruction(file_lines[i]))
-                        i += 1
+                    while True:
+                        instruction_line = format_line(file_lines[i])
+                        features.append(Instruction(instruction_line))
+
+                        if format_line(file_lines[i + 1])[0] in branch_opcodes:
+                            i += 1
+                        else:
+                            break
 
                     # Add sensor to dictionary, then push on features
                     if sensor not in self.features:
@@ -87,7 +89,8 @@ class EcuFile:
 
                 for feature_set in self.features[sensor]:
                     for instruction in feature_set:
-                        print(instruction)
+                        content += "\t" + instruction.gram + "\n"
+                    content += "\n"
         return content
 
 class Instruction:
@@ -110,7 +113,10 @@ class Instruction:
             if operand == "+":
                 self.gram += "+"
             else:
-                self.gram += "." + get_operand_type(operand)
+                if file_line[i] == "+":
+                    self.gram += get_operand_type(operand)
+                else:
+                    self.gram += "." + get_operand_type(operand)
 
     def __str__(self):
         return ("mnemonic: " + self.mnemonic + "\n" +
@@ -168,6 +174,8 @@ def main(argv):
     load_config(argv[0])
 
     control_file = EcuFile(argv[1], True)
+
+    print(control_file)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
