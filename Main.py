@@ -7,7 +7,9 @@ import os
 config = {}
 
 class EcuFile:
-    branch_opcodes = ["jmp", "bra", "jsr", "bbc", "bbs", "bcc", "bcs", "bne", "beq", "bpl", "bmi", "bvc", "bvs"]
+    # todo: is this correct?
+    global branch_opcodes
+    branch_opcodes = ["cmp", "jmp", "bra", "jsr", "bbc", "bbs", "bcc", "bcs", "bne", "beq", "bpl", "bmi", "bvc", "bvs"]
 
     def __init__(self, file_name, is_control=False):
         """
@@ -15,11 +17,14 @@ class EcuFile:
         :param file_name: ECU file that contains instructions
         :param control: whether file_name is the control file
         """
+        self.is_control = is_control
+
         if os.path.exists(file_name):
             if is_control:
                 self._load_control_features(file_name)
             else:
                 self._load_experimental_features(file_name)
+            print("[success] Loaded " + file_name + " features")
         else:
             print("[ error ] " + file_name + " doesn't exist")
             sys.exit()
@@ -32,38 +37,26 @@ class EcuFile:
         self.features = {}
 
         with open(file_name, "r") as file:
-            for file_line in file:
-                file_line = file_line.strip()
-                file_line = [i.replace(",", "") for i in file_line.split()]
+            file_lines = file.readlines()
 
-                if not file_line:
-                    continue
+            for i in range(len(file_lines)):
+                features = []
+                sensor = self._config_sensor(file_lines[i][1:])
 
-                # Find instructions that contain the config sensor addresses
-                for operand in file_line[1:]:
-                    sensor = self._config_sensor(file_line[1:])
+                # Found instruction with sensor address
+                if sensor is not None:
+                    file_lines[i] = format_line(file_lines[i])
+                    features.append(Instruction(file_lines[i]))
 
-                    if sensor is not None:
-                        while True:
-                            instruction = Instruction(file_line)
+                    # Grab instructions that contain branch instructions
+                    while file_lines[i + 1][0] in branch_opcodes:
+                        features.append(Instruction(file_lines[i]))
+                        i += 1
 
-                            file_line = file.next()
-                            sensor = self._config_sensor(file_line[1:])
-
-                            if sensor is None:
-                                break
-
-    def _config_sensor(self, file_line):
-        """
-        Gets the sensor if instruction contains a sensor address that appears in sensor config
-        :param file_line: array of split instruction line
-        :return: sensor address if found (Ex: battery_voltage), None if not
-        """
-        for operand in file_line:
-            for sensor, address in config.items():
-                if operand == address and get_operand_type(operand) == "mem":
-                    return sensor
-        return None
+                    # Add sensor to dictionary, then push on features
+                    if sensor not in self.features:
+                        self.features[sensor] = []
+                    self.features[sensor].append(features)
 
     def _load_experimental_features(self, file_name):
         """
@@ -72,25 +65,56 @@ class EcuFile:
         """
         pass
 
+    def _config_sensor(self, file_line):
+        """
+        Gets the sensor if instruction contains a sensor address that appears in sensor config
+        :param file_line: array of split instruction line
+        :return: sensor address if found (Ex: battery_voltage), None if not
+        """
+        for operand in format_line(file_line):
+            for sensor, address in config.items():
+                if operand == address and get_operand_type(operand) == "mem":
+                    return sensor
+        return None
+
+    def __str__(self):
+        # todo: not finished
+        content = ""
+
+        if self.is_control:
+            for sensor in self.features:
+                content += sensor + "\n"
+
+                for feature_set in self.features[sensor]:
+                    for instruction in feature_set:
+                        print(instruction)
+        return content
+
 class Instruction:
+    """
+    mnemonic: operation done in instruction
+    gram: mnemonic.operands with operand type (Ex: lda.reg.mem)
+    """
+
     def __init__(self, file_line):
         """
         Instruction constructor
         :param file_line: array of split instruction line
         """
-        self.opcode = file_line[0]
-        self.gram = self.opcode
+        self.mnemonic = file_line[0]
+        self.gram = self.mnemonic
 
         for i in range(len(file_line[1:])):
             operand = file_line[i + 1]
 
-            if operand in ["+", "-"]:
-                print(operand)
+            if operand == "+":
+                self.gram += "+"
             else:
                 self.gram += "." + get_operand_type(operand)
 
     def __str__(self):
-        pass
+        return ("mnemonic: " + self.mnemonic + "\n" +
+                "gram: " + self.gram)
 
 def get_operand_type(operand):
     """
@@ -112,8 +136,7 @@ def load_config(file_name):
     if os.path.exists(file_name):
         with open(file_name, "r") as file:
             for file_line in file:
-                file_line = file_line.strip()
-                file_line = file_line.split()
+                file_line = format_line(file_line)
 
                 if not file_line:
                     continue
@@ -128,10 +151,19 @@ def load_config(file_name):
         print("[ error ] " + file_name + " doesn't exist")
         sys.exit()
 
+def format_line(file_line):
+    """
+    :param file_line: string to format
+    :return: split string with removed end spaces/tabs
+    """
+    file_line = file_line.strip()
+
+    return [i.replace(",", "") for i in file_line.split()]
+
 def main(argv):
     """
     Start of program
-    :param argv: execution arguments (config.txt control.txt ecu.txt)
+    :param argv: array execution arguments (config.txt control.txt ecu.txt)
     """
     load_config(argv[0])
 

@@ -1,6 +1,2 @@
 battery_voltage 102f
 vehicle_speed 1071
-engine_speed 106f
-water_temp 1185
-ignition_timing 10a2
-airflow 1283
