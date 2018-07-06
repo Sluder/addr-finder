@@ -3,7 +3,6 @@
 import sys
 import os
 
-# Global
 config = {}
 
 class EcuFile:
@@ -80,7 +79,6 @@ class EcuFile:
         return None
 
     def __str__(self):
-        # todo: not finished
         content = ""
 
         if self.is_control:
@@ -91,6 +89,10 @@ class EcuFile:
                     for instruction in feature_set:
                         content += "\t" + instruction.gram + "\n"
                     content += "\n"
+        else:
+            # todo: output non control features
+            return content
+
         return content
 
 class Instruction:
