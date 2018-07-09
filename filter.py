@@ -21,9 +21,11 @@ def main(argv):
                 file_line = file_line.partition(';')[0]
                 file_line = file_line.rstrip().split()
 
+                # Filter blank lines
                 if file_line:
                     lines.append(' '.join(file_line[2:]))
 
+            # Write filtered text to file
             file.truncate(0)
 
             for line in lines:
