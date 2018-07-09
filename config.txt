@@ -1,0 +1,6 @@
+battery_voltage 0x102f
+vehicle_speed 0x1071
+engine_speed 0x106f
+water_temp 0x1185
+ignition_timing 0x10a2
+airflow 0x1283
