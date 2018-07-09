@@ -56,7 +56,7 @@ def test():
     ecuInstructionList = []
 
     # Go through each line of the ECU file and make a list of instructions
-    with open("ecu.txt") as ecuFile:
+    with open("test.txt") as ecuFile:
         for line in ecuFile:
             tmpEcuInstruction = Instruction(line, ecuUsedValues)
             ecuInstructionList.append(tmpEcuInstruction)
