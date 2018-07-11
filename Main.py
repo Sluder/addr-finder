@@ -43,10 +43,16 @@ def test():
         # Adds unecessary block at the end: NEED TO FIX AT SOMEPOINT
         controlBlockList.pop()
 
+
         # Fill dictionary with features for each control sensor address
         # VALUE: sensorAddress
         # BLOCK LIST: list of features for each control sensor address
         controlBlockDict[value] = controlBlockList
+    for key, value in controlBlockDict.items():
+        for block in value:
+            print(key)
+            print(block.controlBlockOpCodes)
+
 
 
     # THIS PORTION IS FOR THE ECU FILE
@@ -67,15 +73,21 @@ def test():
     ecuBlockList = []
     while startIndex < len(ecuInstructionList) and startIndex != None:
         tmpEcuBlock = EcuBlock(ecuInstructionList, startIndex, branchOpcodes)
+        if startIndex < 1799:
+            print(startIndex)
+            print(tmpEcuBlock.ecuAddress)
+            print(tmpEcuBlock.ecuBlockOpCodes)
         if tmpEcuBlock.ecuAddress is not None:
             ecuBlockList.append(tmpEcuBlock)
+            #if tmpEcuBlock.ecuAddress == "0x102f":
+                #print(tmpEcuBlock.ecuBlockOpCodes)
         startIndex = tmpEcuBlock.ecuBlockEnd
 
     ecuBlockDict = EcuBlockDict(ecuBlockList)
 
     # Create Jaccard Object
     jaccard = Jaccard(controlBlockDict, ecuBlockDict)
-    print(jaccard.foundSensors)
+    #print(jaccard.foundSenors)
 
     # Make Table
 
@@ -95,7 +107,7 @@ def test():
         tableList = [key] + tableList
         table.add_row(tableList)
 
-    print(table)
+    #print(table)
 
 
 

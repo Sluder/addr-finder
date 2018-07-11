@@ -28,7 +28,6 @@ class Jaccard():
         for controlKey, controlValue in controlDict.items():
             jaccardList = []
             for ecuKey, ecuValue in ecuDict.items():
-                #print("next")
                 jaccardList = []
                 for ecuBlock in ecuValue:
                     for controlBlock in controlValue:
