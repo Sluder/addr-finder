@@ -3,12 +3,12 @@
 import sys
 import os
 
-def main(argv):
+if __name__ == "__main__":
     """
-    Start of program
+    Start process of filtering disassembled ECU code
     :param argv: array execution arguments (input.txt)
     """
-    file_name = argv[0]
+    file_name = sys.argv[0]
     lines = []
 
     # Check for file & start filtering
@@ -35,6 +35,3 @@ def main(argv):
     else:
         print("[ error ] " + file_name + " doesn't exist")
         sys.exit()
-
-if __name__ == "__main__":
-    main(sys.argv[1:])
