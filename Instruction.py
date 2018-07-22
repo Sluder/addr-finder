@@ -34,7 +34,6 @@ class Instruction:
         """
         :return: formatted string with all instance variables
         """
-        return ("text:" + self.text + "\n" +
-                "mnemonic: " + self.mnemonic + "\n" +
-                "operands: " + self.operands + "\n" +
-                "gram: " + self.gram)
+        return ("Text :     " + self.text + "\n" +
+                "Mnemonic : " + self.mnemonic + "\n" +
+                "Gram :     " + self.gram + "\n")

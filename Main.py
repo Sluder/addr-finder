@@ -27,6 +27,21 @@ def _load_config(file_name):
         print("[ error ] " + file_name + " doesn't exist")
         sys.exit()
 
+def _calculate_jaccard_index(control_feature, experimental_feature):
+    """
+    Calculates Jaccard Index for two different feature blocks
+    :param control_feature: feature for control file
+    :param experimental_feature: feature for experimental file
+    :return: float of Jaccard index
+    """
+    control_set = control_feature.get_instruction_set()
+    experimental_set = experimental_feature.get_instruction_set()
+
+    intersection = len(list(set(control_set).intersection(experimental_set)))
+    union = len(control_set) + len(experimental_set) - intersection
+
+    return float(intersection / union)
+
 if __name__ == "__main__":
     """
     Start of program
@@ -36,3 +51,17 @@ if __name__ == "__main__":
 
     control_file = EcuFile(sys.argv[2], True)
     experimental_file = EcuFile(sys.argv[3], False)
+
+    print(control_file)
+
+    # # Loop through experimental file features
+    # for address, feature_set in experimental_file.features.items():
+    #     for feature in feature_set.features:
+    #         # Loop though control file features
+    #         for control_sensor, control_feature_set in control_file.features.items():
+    #             jaccard_indexes = []
+    #
+    #             for control_feature in control_feature_set:
+    #                 value = _calculate_jaccard_index(control_feature, feature)
+    #                 feature.set_jaccard_index(value)
+    #                 jaccard_indexes.append(value)
