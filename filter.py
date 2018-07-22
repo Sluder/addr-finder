@@ -8,7 +8,7 @@ if __name__ == "__main__":
     Start process of filtering disassembled ECU code
     :param argv: array execution arguments (input.txt)
     """
-    file_name = sys.argv[0]
+    file_name = sys.argv[1]
     lines = []
 
     # Check for file & start filtering

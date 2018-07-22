@@ -36,5 +36,3 @@ if __name__ == "__main__":
 
     control_file = EcuFile(sys.argv[2], True)
     experimental_file = EcuFile(sys.argv[3], False)
-
-    #print(experimental_file)

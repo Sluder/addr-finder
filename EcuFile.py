@@ -2,8 +2,15 @@ import os
 
 import Global
 from Instruction import Instruction
+from Feature import Feature
 
 class EcuFile:
+    """
+    Container class for each ECU file to analyze
+    self.is_control: if file is the control in the analyzing
+    self.features: array of Feature objects
+    """
+
     def __init__(self, file_name, is_control=False):
         """
         EcuFile constructor
@@ -44,15 +51,16 @@ class EcuFile:
                     instruction_line = Global.format_line(file_lines[i])
                     features.append(Instruction(instruction_line))
 
-                    if Global.format_line(file_lines[i + 1])[0] in branch_opcodes:
+                    if (i + 1 < len(file_lines)) and Global.format_line(file_lines[i + 1])[0] in branch_opcodes:
                         i += 1
                     else:
                         break
 
                 # Add sensor to dictionary, then push on features
+                feature_block = Feature(features)
                 if sensor not in self.features:
                     self.features[sensor] = []
-                self.features[sensor].append(features)
+                self.features[sensor].append(feature_block)
 
     def _load_experimental_features(self, file_lines, branch_opcodes):
         """
@@ -71,15 +79,16 @@ class EcuFile:
                         instruction_line = Global.format_line(file_lines[i + counter])
                         features.append(Instruction(instruction_line))
 
-                        if Global.format_line(file_lines[i + counter + 1])[0] in branch_opcodes:
+                        if (i + counter + 1 < len(file_lines)) and Global.format_line(file_lines[i + counter + 1])[0] in branch_opcodes:
                             counter += 1
                         else:
                             break
 
                     # Add memory features to group
+                    feature_block = Feature(features)
                     if operand not in self.features:
                         self.features[operand] = []
-                    self.features[operand].append(features)
+                    self.features[operand].append(feature_block)
 
     def _config_sensor(self, file_line):
         """
@@ -100,10 +109,10 @@ class EcuFile:
         content = ""
 
         for address in self.features:
-            content += address + "\n"
+            content += Global.config[address] + "\n" if self.is_control else address + "\n"
 
-            for feature_set in self.features[address]:
-                for instruction in feature_set:
+            for feature_block in self.features[address]:
+                for instruction in feature_block.instructions:
                     content += "\t" + instruction.gram + "\n"
                 content += "\n"
 

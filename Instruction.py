@@ -2,9 +2,10 @@ import Global
 
 class Instruction:
     """
-    text: original instruction text (Ex: lda al 0x1070)
-    mnemonic: operation done in instruction
-    gram: mnemonic.operands with operand type (Ex: lda.reg.mem)
+    self.text: original instruction text (Ex: lda al 0x1070)
+    self.mnemonic: operation done in instruction
+    self.operands: array of instruction operands
+    self.gram: mnemonic.operands with operand type (Ex: lda.reg.mem)
     """
 
     def __init__(self, file_line):
@@ -14,11 +15,13 @@ class Instruction:
         """
         self.text = ' '.join(file_line)
         self.mnemonic = file_line[0]
+        self.operands = file_line[1:]
         self.gram = self.mnemonic
 
         for i in range(len(file_line[1:])):
             operand = file_line[i + 1]
 
+            # Handle operand arithmetic
             if operand == "+":
                 self.gram += "+"
             else:
@@ -29,7 +32,9 @@ class Instruction:
 
     def __str__(self):
         """
-        :return: formatted string
+        :return: formatted string with all instance variables
         """
-        return ("mnemonic: " + self.mnemonic + "\n" +
+        return ("text:" + self.text + "\n" +
+                "mnemonic: " + self.mnemonic + "\n" +
+                "operands: " + self.operands + "\n" +
                 "gram: " + self.gram)
