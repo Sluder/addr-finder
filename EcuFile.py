@@ -43,26 +43,26 @@ class EcuFile:
         """
         for i in range(len(file_lines)):
             sensor = self._config_sensor(file_lines[i][1:])
-            feature_blocks = []
 
             # Found instruction with sensor address
             if sensor is not None:
-                grams = []
+                instructions = []
 
                 # Grab instructions that contain branch instructions
                 while True:
                     instruction_line = Global.format_line(file_lines[i])
-                    grams.append(Instruction(instruction_line))
+                    instructions.append(Instruction(instruction_line))
 
                     if (i + 1 < len(file_lines)) and Global.format_line(file_lines[i + 1])[0] in branch_opcodes:
                         i += 1
                     else:
                         break
 
-                # Add sensor to dictionary, then push on features
-                feature_blocks.append(Feature(grams))
-
-                self.features[sensor] = FeatureSet(feature_blocks)
+                # Add sensor memory address features to group
+                if sensor in self.features:
+                    self.features[sensor].features.append(Feature(instructions))
+                else:
+                    self.features[sensor] = FeatureSet(Feature(instructions))
 
     def _load_experimental_features(self, file_lines, branch_opcodes):
         """
@@ -72,26 +72,25 @@ class EcuFile:
         for i in range(len(file_lines)):
             # Check if instruction contains a memory address
             for operand in Global.format_line(file_lines[i])[1:]:
-                feature_blocks = []
-
                 if Global.get_operand_type(operand) == "mem":
-                    grams = []
+                    instructions = []
                     counter = 0
 
                     # Create feature set with load instruction, and following control instructions
                     while True:
                         instruction_line = Global.format_line(file_lines[i + counter])
-                        grams.append(Instruction(instruction_line))
+                        instructions.append(Instruction(instruction_line))
 
                         if (i + counter + 1 < len(file_lines)) and Global.format_line(file_lines[i + counter + 1])[0] in branch_opcodes:
                             counter += 1
                         else:
                             break
 
-                    # Add memory features to group
-                    feature_blocks.append(Feature(grams))
-
-                self.features[operand] = FeatureSet(feature_blocks)
+                    # Add operand memory address features to group
+                    if operand in self.features:
+                        self.features[operand].features.append(Feature(instructions))
+                    else:
+                        self.features[operand] = FeatureSet(Feature(instructions))
 
     def _config_sensor(self, file_line):
         """

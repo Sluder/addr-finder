@@ -30,8 +30,8 @@ def _load_config(file_name):
 def _calculate_jaccard_index(control_feature, experimental_feature):
     """
     Calculates Jaccard Index for two different feature blocks
-    :param control_feature: feature for control file
-    :param experimental_feature: feature for experimental file
+    :param control_feature: Feature object for control file
+    :param experimental_feature: Feature object for experimental file
     :return: float of Jaccard index
     """
     control_set = control_feature.get_instruction_set()
@@ -52,16 +52,25 @@ if __name__ == "__main__":
     control_file = EcuFile(sys.argv[2], True)
     experimental_file = EcuFile(sys.argv[3], False)
 
-    print(control_file)
+    # Loop through experimental file features
+    for address, feature_set in experimental_file.features.items():
+        for feature in feature_set.features:
+            jaccard_indexes = []
 
-    # # Loop through experimental file features
-    # for address, feature_set in experimental_file.features.items():
-    #     for feature in feature_set.features:
-    #         # Loop though control file features
-    #         for control_sensor, control_feature_set in control_file.features.items():
-    #             jaccard_indexes = []
-    #
-    #             for control_feature in control_feature_set:
-    #                 value = _calculate_jaccard_index(control_feature, feature)
-    #                 feature.set_jaccard_index(value)
-    #                 jaccard_indexes.append(value)
+            # Loop though control file features
+            for control_sensor, control_feature_set in control_file.features.items():
+                max_jaccard_index = 0.0
+
+                for control_feature in control_feature_set.features:
+                    value = _calculate_jaccard_index(control_feature, feature)
+
+                    if value > max_jaccard_index:
+                        max_jaccard_index = value
+
+                feature.set_jaccard_index(max_jaccard_index)
+                jaccard_indexes.append(max_jaccard_index)
+
+            feature_set.jaccard_index = sum(jaccard_indexes) / len(jaccard_indexes)
+
+            if feature_set.jaccard_index == 1.0:
+                print(address)

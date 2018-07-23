@@ -30,10 +30,3 @@ class Instruction:
                 else:
                     self.gram += "." + Global.get_operand_type(operand)
 
-    def __str__(self):
-        """
-        :return: formatted string with all instance variables
-        """
-        return ("Text :     " + self.text + "\n" +
-                "Mnemonic : " + self.mnemonic + "\n" +
-                "Gram :     " + self.gram + "\n")

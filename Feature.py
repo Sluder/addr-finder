@@ -31,8 +31,3 @@ class Feature:
         """
         self.jaccard_index = value
 
-    def __str__(self):
-        """
-        :return: formatted string for instance variables
-        """
-        return "Jaccard Index: " + str(self.jaccard_index)
